@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-4 bg-gray-50">
+<h1 class="text-xl font-bold">Teacher Dashboard - Class Teacher</h1>
+<p class="text-sm">You are Class Teacher for: Grade 7A - Add learners here. Other teachers will enter marks for their subjects.</p>
+
+<div class="bg-white p-4 mt-4 rounded shadow">
+<h2 class="font-bold">Add Learner (UPI / Admission No)</h2>
+<input placeholder="UPI (e.g. U123456)" class="border p-2 rounded w-48 mt-2">
+<input placeholder="Full Name" class="border p-2 rounded w-48 mt-2">
+<input placeholder="Admission No" class="border p-2 rounded w-32 mt-2">
+<button class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Add Learner</button>
+</div>
+
+<div class="bg-white p-4 mt-4 rounded shadow">
+<h2 class="font-bold">Enter Marks - Only when Admin Opens Exam</h2>
+<p class="text-xs">Opener | Mid Term | Closing - System will auto grade EE/ME/AE/BE</p>
+<table class="w-full border mt-2 text-sm">
+<tr class="bg-gray-100"><th>ADM</th><th>Name</th><th>Math Score</th><th>Grade</th></tr>
+<tr><td>ADM001</td><td>John Kamau</td><td><input class="border w-16 p-1" value="68"></td><td>ME</td></tr>
+<tr><td>ADM002</td><td>Mary Akinyi</td><td><input class="border w-16 p-1" value="82"></td><td>EE</td></tr>
+</table>
+<button class="bg-green-700 text-white px-4 py-2 rounded mt-3">Save Marks + Calculate Position</button>
+</div>
+
+<div class="bg-white p-4 mt-4 rounded shadow">
+<button class="bg-black text-white px-4 py-2 rounded">Print Report Card - With Graph + Position + Remarks + Stamp Space</button>
+</div>
+</body>
+</html>

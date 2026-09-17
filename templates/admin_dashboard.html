@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 p-4">
+<h1 class="text-2xl font-bold">School Admin - Dashboard</h1>
+<p class="text-sm">Access: schoolcode.yourdomain.com - Each school independent</p>
+
+<div class="grid grid-cols-2 gap-3 mt-4">
+<div class="bg-white p-4 rounded shadow">
+<h3 class="font-bold">Classes</h3>
+<p class="text-xs">PP1, PP2, Grade 1-9</p>
+<button class="bg-blue-600 text-white px-3 py-1 rounded mt-2 text-sm">Add Class + Stream (e.g., 7A)</button>
+</div>
+<div class="bg-white p-4 rounded shadow">
+<h3 class="font-bold">Teachers</h3>
+<p class="text-xs">Add Teacher - Auto password visible to SuperAdmin</p>
+<button class="bg-green-600 text-white px-3 py-1 rounded mt-2 text-sm">Add Teacher</button>
+</div>
+<div class="bg-white p-4 rounded shadow">
+<h3 class="font-bold">Exam Control</h3>
+<p class="text-xs">Open / Close: Opener | Mid Term | Closing</p>
+<button class="bg-yellow-600 text-white px-3 py-1 rounded mt-2 text-sm">Open Exams</button>
+</div>
+<div class="bg-white p-4 rounded shadow">
+<h3 class="font-bold">School Info</h3>
+<p class="text-xs">Logo | Name | Motto | County | SubCounty</p>
+<input type="file" class="text-xs mt-1">
+</div>
+</div>
+
+<div class="bg-white p-4 mt-4 rounded shadow">
+<h3 class="font-bold">Performance Chart (Mean per Exam)</h3>
+<canvas id="chart"></canvas>
+</div>
+
+<script>
+new Chart(document.getElementById('chart'),{
+type:'bar',
+data:{labels:['Opener','Mid','Closing'], datasets:[{label:'School Mean', data:[55,62,68], backgroundColor:'blue'}]}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>@media print{.no-print{display:none}}</style>
+</head>
+<body class="bg-white p-2">
+<div class="max-w-4xl mx-auto border-2 border-black p-4">
+<div class="text-center border-b-2 border-black pb-2">
+<h1 class="text-xl font-bold">[SCHOOL LOGO] ELIMU ACADEMY</h1>
+<p class="text-xs">Motto: Elimu ni Ufunguo | Kitui County, SubCounty: Kitui West | Tel: 07xx</p>
+</div>
+
+<div class="grid grid-cols-2 text-sm mt-3">
+<p>Learner: John Kamau</p><p>UPI: U123456</p>
+<p>Class: Grade 7A</p><p>ADM: ADM001</p>
+<p>Position: 8 out of 42</p><p>Term: Closing 2026</p>
+</div>
+
+<table class="w-full border mt-4 text-sm border-collapse">
+<tr class="bg-gray-200"><th class="border">Subject</th><th class="border">Opener</th><th class="border">Mid</th><th class="border">Closing</th><th class="border">Avg</th><th class="border">Grade</th></tr>
+<tr><td class="border p-1">Mathematics</td><td class="border p-1">65</td><td class="border p-1">70</td><td class="border p-1">75</td><td class="border p-1">70</td><td class="border p-1">ME</td></tr>
+<tr><td class="border p-1">English</td><td class="border p-1">80</td><td class="border p-1">85</td><td class="border p-1">82</td><td class="border p-1">82</td><td class="border p-1">EE</td></tr>
+</table>
+
+<canvas id="myGraph" class="mt-4" height="100"></canvas>
+
+<div class="grid grid-cols-2 gap-8 mt-6 text-sm">
+<div>Class Teacher Remark: ___________<br><br>Signature: ________</div>
+<div>Headteacher Remark: ___________<br><br>Signature & Stamp Space: [ ]</div>
+</div>
+
+<p class="text-xs mt-4">Grading: EE=Exceeding Expectation (80-100), ME=Meeting (60-79), AE=Approaching (40-59), BE=Below (0-39)</p>
+
+<button onclick="window.print()" class="no-print bg-black text-white px-6 py-2 rounded mt-4">Print This Report</button>
+</div>
+
+<script>
+new Chart(document.getElementById('myGraph'),{
+type:'line',
+data:{labels:['Opener','Mid','Closing'],datasets:[{label:'Performance',data:[65,70,75],borderColor:'blue'}]}
+});
+</script>
+</body>
+</html>

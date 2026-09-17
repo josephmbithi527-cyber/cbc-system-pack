@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+<div class="bg-white p-6 rounded shadow w-full max-w-md">
+<h2 class="font-bold text-xl mb-2">Parent / Learner Portal</h2>
+<p class="text-xs text-gray-600 mb-4">Login using ONLY UPI or Admission No - No Password needed. As you requested.</p>
+
+<input id="upi" placeholder="Enter UPI e.g. U12345 or ADM001" class="border w-full p-3 rounded mb-3">
+
+<button onclick="show()" class="bg-blue-700 text-white w-full p-3 rounded">View Results</button>
+
+<div id="result" class="hidden mt-6 border-t pt-4">
+<p class="font-bold">John Kamau - Grade 7A - Position 8 / 42</p>
+<table class="w-full border mt-2 text-sm">
+<tr class="bg-gray-100"><th>Subject</th><th>Score</th><th>Grade</th></tr>
+<tr><td>Math</td><td>68</td><td>ME</td></tr>
+<tr><td>English</td><td>82</td><td>EE</td></tr>
+<tr><td>Kiswahili</td><td>55</td><td>AE</td></tr>
+</table>
+<canvas id="graph" class="mt-4"></canvas>
+<p class="text-xs mt-2">Remarks: Good progress. Teacher: ___ Headteacher: ___</p>
+</div>
+</div>
+
+<script>
+function show(){
+document.getElementById('result').classList.remove('hidden');
+new Chart(document.getElementById('graph'),{type:'line',data:{labels:['Opener','Mid','Closing'],datasets:[{label:'Performance',data:[60,65,70],borderColor:'blue'}]}});
+}
+</script>
+</body>
+</html>

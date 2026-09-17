@@ -58,31 +58,34 @@ CBC_CLASSES = ["PP1","PP2","Grade 1","Grade 2","Grade 3","Grade 4","Grade 5","Gr
 CBC_SUBJECTS = ["Mathematics","English","Kiswahili","Science & Technology","Social Studies","CRE","Agriculture","Music","Art & Craft","PE"]
 
 def get_school_from_request():
+    # Only use ?school=CODE - Don't read Render domain
     code = request.args.get('school') or request.args.get('code') or ''
-    if not code:
-        # check subdomain like kim917.yourdomain.com
-        host = request.host.split('.')[0].lower()
-        if len(host) >= 6: code = host.upper()
     return code.strip().upper()
 
-# ================= HOME =================
+# ================= HOME - FIXED =================
 @app.route('/')
 def home():
     scode = get_school_from_request()
     if scode:
         return school_home(scode)
-    return render_template_string(STYLE+"""
+    # Show MAIN landing page, not school error
+    schools = get_all_schools()
+    scount = len(schools)
+    return render_template_string(STYLE+f"""
     <div class='max-w-5xl mx-auto text-center mt-10 p-6 font-sans'>
     <h1 class='text-4xl font-black'>🇰🇪 CBC MULTI-SCHOOL SYSTEM</h1>
-    <p class='text-gray-600 mt-2'>PP1 - Grade 9 | One Link Per School | By Joseph - Kitui</p>
+    <p class='text-gray-600 mt-2'>PP1 - Grade 9 | One Link Per School | By Joseph - Kitui | {scount} Schools Live</p>
     <div class='grid grid-cols-1 md:grid-cols-3 gap-4 mt-10'>
-      <a href='/superadmin/login' class='bg-black text-white p-6 rounded-xl shadow'>👑 SUPER ADMIN<br><span class='text-xs'>Add Schools & See Passwords</span></a>
-      <div class='bg-green-600 text-white p-6 rounded-xl shadow'>🏫 HOW IT WORKS<br><span class='text-xs'>Each school: CODE.yourdomain.com?school=CODE<br>Admin: CODE_admin / Admin123</span></div>
-      <div class='bg-blue-600 text-white p-6 rounded-xl shadow'>🔐 SECURITY<br><span class='text-xs'>• Super sees all passwords (yellow)<br>• First login forces change<br>• Passwords hidden ••••</span></div>
+      <a href='/superadmin/login' class='bg-black text-white p-6 rounded-xl shadow'>👑 SUPER ADMIN<br><span class='text-xs'>Add Schools & See Passwords (••••)</span></a>
+      <div class='bg-green-600 text-white p-6 rounded-xl shadow'>🏫 YOUR SCHOOLS<br><span class='text-xs'>Use ?school=CODE<br>KIM917, KAB861 Live</span></div>
+      <div class='bg-blue-600 text-white p-6 rounded-xl shadow'>🔗 TEST LINK<br><span class='text-xs'>cbc-system-pack.onrender.com/?school=KIM917</span></div>
     </div>
-    <p class='mt-8 text-xs'>Live: cbc-system-pack.onrender.com | Current Schools: """+str(len(get_all_schools()))+"""</p>
+    <div class='mt-10 bg-white p-4 rounded shadow text-left'>
+      <h3 class='font-bold'>📚 How to Open a School:</h3>
+      <p class='text-sm mt-2'>1. Super Admin adds school → Code KIM917<br>2. Open: <b>https://cbc-system-pack.onrender.com/?school=KIM917</b><br>3. Click School Admin Login → User: kim917_admin / Admin123 → Set new password ••••<br>4. Dashboard → Add Learners PP1-G9</p>
+    </div>
+    <p class='mt-8 text-xs'>Live: cbc-system-pack.onrender.com | Main domain fixed!</p>
     </div>""")
-
 def get_all_schools():
     con=get_db(); c=con.cursor()
     try: c.execute("SELECT * FROM schools ORDER BY id DESC"); rows=c.fetchall()

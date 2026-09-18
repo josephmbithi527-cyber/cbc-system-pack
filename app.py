@@ -112,6 +112,20 @@ def school_home(code):
     </div>
     <p class='mt-6'><a href='/' class='underline'>← Back to Main</a></p></div>""")
 
+@app.route('/superadmin/delete/<code>')
+def delete_school(code):
+    if not session.get('super'): return redirect('/superadmin/login')
+    code=code.upper()
+    try:
+        con=get_db(); c=con.cursor()
+        run(c,"DELETE FROM schools WHERE code=%s",(code,))
+        run(c,"DELETE FROM learners WHERE school_code=%s",(code,))
+        run(c,"DELETE FROM classes WHERE school_code=%s",(code,))
+        run(c,"DELETE FROM users WHERE school_code=%s",(code,))
+        con.commit(); con.close()
+    except Exception as e:
+        print("Delete error:", e)
+    return redirect('/superadmin/dashboard')
 # ================= SUPER ADMIN =================
 @app.route('/superadmin/login', methods=['GET','POST'])
 def s_login():

@@ -301,6 +301,15 @@ def view_learners(code):
     con=get_db(); c=con.cursor(); c.execute("SELECT * FROM learners WHERE school_code=%s ORDER BY class_name".replace('%s','?') if not DATABASE_URL else "SELECT * FROM learners WHERE school_code=%s ORDER BY class_name",(code,)); rows=c.fetchall(); con.close()
     tr="".join([f"<tr><td class='p-2 border'>{dict(r).get('admission_no')}</td><td class='p-2 border'>{dict(r).get('fullname')}</td><td class='p-2 border'>{dict(r).get('class_name')}</td><td class='p-2 border'>{dict(r).get('gender')}</td><td class='p-2 border'>{dict(r).get('upi')}</td></tr>" for r in rows])
     return render_template_string(STYLE+f"<div class='p-4 font-sans'><h2 class='font-bold'>{code} Learners - {len(rows)}</h2><table class='w-full mt-4 border text-sm'><tr class='bg-black text-white'><th class='p-2'>Adm No</th><th>Name</th><th>Class</th><th>Gender</th><th>UPI</th></tr>{tr or '<tr><td colspan=5 class=text-center p-4>No learners yet</td></tr>'}</table><br><a href='/school/{code}/dashboard' class='underline'>← Dashboard</a></div>")
-
+# --- TEMP RESET - PASTE HERE ---
+@app.route('/reset/<code>')
+def reset(code):
+    code=code.upper()
+    con=get_db(); c=con.cursor()
+    run(c,"UPDATE users SET password=%s WHERE school_code=%s",('Admin123',code))
+    run(c,"UPDATE schools SET admin_pass=%s WHERE code=%s",('Admin123',code))
+    con.commit(); con.close()
+    return f"{code} reset to Admin123 - <a href='/school/{code}/login'>Now Login</a>"
+# --- END RESET ---
 if __name__=='__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT',10000)))

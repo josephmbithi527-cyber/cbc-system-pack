@@ -174,26 +174,81 @@ def s_dash():
     </div><br><a href='/' class='underline'>Home</a> | <a href='/superadmin/login'>Logout</a></div>""")
 
 # ================= SCHOOL ADMIN LOGIN =================
+
 @app.route('/school/<code>/login', methods=['GET','POST'])
 def school_login(code):
     code=code.upper()
     con=get_db(); c=con.cursor()
-    run(c,"SELECT * FROM schools WHERE code=%s",(code,)); sch=c.fetchone()
-    if not sch: con.close(); return "School not found"
-    schd=dict(sch)
-    # Check first login
-    first = 1 if schd.get('admin_pass')=="Admin123" else 0
+    run(c,"SELECT * FROM schools WHERE code=%s",(code,)); s=c.fetchone(); con.close()
+    if not s: return "School not found"
+    msg=""
     if request.method=='POST':
-        pwd=(request.form.get('newpass') or request.form.get('pass') or '').strip()
-        if first==1:
-            run(c,"UPDATE schools SET admin_pass=%s WHERE code=%s",(pwd,code)); con.commit(); con.close(); session[f'school_{code}']=True; return redirect(f'/school/{code}/dashboard')
-        else:
-            if pwd==schd.get('admin_pass'): con.close(); session[f'school_{code}']=True; return redirect(f'/school/{code}/dashboard')
-            con.close(); return "Wrong password <a href=''>Back</a>"
-    con.close()
-    form = f"<p class='bg-yellow-100 p-2 text-xs mb-2'>FIRST LOGIN: Change default Admin123. Password hidden ••••</p><form method='POST'><input name='newpass' type='password' placeholder='New Password ••••' class='w-full border p-3 mb-3' required><button class='bg-black text-white w-full p-3'>SET PASSWORD</button></form>" if first==1 else f"<form method='POST'><input name='pass' type='password' placeholder='••••••••' class='w-full border p-3 mb-3' required><button class='bg-black text-white w-full p-3'>LOGIN AS {schd.get('admin_user')}</button></form>"
-    return render_template_string(STYLE+f"<div class='max-w-sm mx-auto mt-16 bg-white p-8 rounded shadow'><h2 class='font-bold text-center'>{schd.get('name')}<br><span class='text-xs'>{code} Admin</span></h2><div class='mt-4'>{form}</div><a href='/?school={code}' class='text-xs underline'>← School Home</a></div>")
+        u=request.form['username']; p=request.form['password']
+        con=get_db(); c=con.cursor()
+        run(c,"SELECT * FROM users WHERE username=%s AND school_code=%s",(u,code))
+        user=c.fetchone(); con.close()
+        if user and dict(user).get('password')==p:
+            # FORCED FIRST PASSWORD CHECK
+            if p=='Admin123':
+                session[f'school_{code}_first']=u
+                return redirect(f'/school/{code}/set_first_password')
+            session[f'school_{code}']=u
+            session[f'school_{code}_role']=dict(user).get('role')
+            return redirect(f'/school/{code}/dashboard')
+        msg="Wrong password"
+    return render_template_string(STYLE+f"""
+    <div class='p-6 max-w-md mx-auto font-sans'>
+    <h2 class='text-xl font-bold'>🏫 {code} - Admin Login</h2>
+    <p class='text-xs'>Login: {code.lower()}.yourdomain.com -> Login as Admin</p>
+    <p class='text-xs'>schoolcode.yourdomain.com → ?school={code}</p>
+    <form method=post class='mt-4'>
+    <input name=username value='{code.lower()}_admin' class='border p-2 w-full rounded'>
+    <input name=password type=password placeholder='Password hidden ••••' class='border p-2 w-full rounded mt-2'>
+    <button class='bg-black text-white w-full p-2 mt-3 rounded'>Login as Admin</button>
+    <p class='text-red-600 text-xs mt-2'>{msg}</p>
+    </form>
+    <p class='text-xs mt-2'>First login: <b>Admin123</b> -> forced to Set First Password</p>
+    </div>""")
 
+@app.route('/school/<code>/set_first_password', methods=['GET','POST'])
+def set_first_password(code):
+    code=code.upper()
+    if not session.get(f'school_{code}_first'): return redirect(f'/school/{code}/login')
+    msg=""
+    if request.method=='POST':
+        np=request.form['newpass']; cp=request.form['confpass']
+        if np!=cp: msg="Passwords not match"
+        elif len(np)<4: msg="Password too short"
+        else:
+            con=get_db(); c=con.cursor()
+            run(c,"UPDATE users SET password=%s WHERE username=%s AND school_code=%s",(np,session[f'school_{code}_first'],code))
+            run(c,"UPDATE schools SET admin_pass=%s WHERE code=%s",(np,code))
+            con.commit(); con.close()
+            session.pop(f'school_{code}_first')
+            session[f'school_{code}']=f"{code.lower()}_admin"
+            return redirect(f'/school/{code}/dashboard')
+    return render_template_string(STYLE+f"<div class='p-6 max-w-md mx-auto font-sans'><h2 class='font-bold'>🔐 SET FIRST PASSWORD - {code}</h2><p class='text-xs'>Password hidden, MUST change from Admin123</p><form method=post class='mt-4'><input name=newpass type=password placeholder='New Password' class='border p-2 w-full rounded'><input name=confpass type=password placeholder='Confirm Password' class='border p-2 w-full rounded mt-2'><button class='bg-blue-600 text-white w-full p-2 mt-3 rounded'>Set Password</button><p class='text-red-600 text-xs'>{msg}</p></form></div>")
+
+@app.route('/school/<code>/change_password', methods=['GET','POST'])
+def change_password(code):
+    code=code.upper()
+    if not session.get(f'school_{code}'): return redirect(f'/school/{code}/login')
+    msg=""
+    if request.method=='POST':
+        old=request.form['old']; new=request.form['new']; conf=request.form['conf']
+        con=get_db(); c=con.cursor()
+        run(c,"SELECT * FROM users WHERE username=%s AND school_code=%s",(session[f'school_{code}'],code))
+        u=c.fetchone()
+        if not u or dict(u).get('password')!=old: msg="Previous Password wrong! MUST enter Previous Password"
+        elif new!=conf: msg="New passwords not match"
+        else:
+            run(c,"UPDATE users SET password=%s WHERE username=%s AND school_code=%s",(new,session[f'school_{code}'],code))
+            run(c,"UPDATE schools SET admin_pass=%s WHERE code=%s",(new,code))
+            con.commit(); con.close()
+            msg="Password changed!"
+            return redirect(f'/school/{code}/dashboard')
+        con.close()
+    return render_template_string(STYLE+f"<div class='p-6 max-w-md mx-auto font-sans'><h2 class='font-bold'>Change Password - {code}</h2><form method=post class='mt-4'><input name=old type=password placeholder='Previous Password (MUST)' class='border p-2 w-full rounded'><input name=new type=password placeholder='New Password' class='border p-2 w-full mt-2 rounded'><input name=conf type=password placeholder='Confirm New' class='border p-2 w-full mt-2 rounded'><button class='bg-black text-white w-full p-2 mt-3 rounded'>Change</button><p class='text-red-600 text-xs mt-2'>{msg}</p></form><a href='/school/{code}/dashboard' class='underline text-xs'>← Dashboard</a></div>")
 @app.route('/school/<code>/dashboard')
 def school_dash(code):
     code=code.upper()
